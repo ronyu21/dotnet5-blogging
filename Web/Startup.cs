@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Infrastructure.Configurations;
-using Infrastructure.DatabaseContexts;
+using Infrastructure.Repository;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -37,7 +37,8 @@ namespace Web
 
             var databaseOptions = new DatabaseOptions();
             Configuration.GetSection(DatabaseOptions.Key).Bind(databaseOptions);
-            services.AddDbContext<BloggingContext>(options => options.UseNpgsql(databaseOptions.ConnectionString()));
+            services.AddDbContext<BloggingContext>(options => options.UseNpgsql(databaseOptions.ConnectionString(),
+                b => b.MigrationsAssembly("Infrastructure")).UseSnakeCaseNamingConvention());
 
             services.AddSwaggerGen(c => { c.SwaggerDoc("v1", new OpenApiInfo {Title = "Web", Version = "v1"}); });
             services.AddSpaStaticFiles(options => options.RootPath = "client-app/dist");

@@ -1,9 +1,10 @@
+using System;
 using Infrastructure.Configurations;
 using Infrastructure.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
-namespace Infrastructure.DatabaseContexts
+namespace Infrastructure.Repository
 {
     public class BloggingContext : DbContext
     {
@@ -16,10 +17,17 @@ namespace Infrastructure.DatabaseContexts
 
         public DbSet<Blog> Blogs { get; set; }
         public DbSet<Post> Posts { get; set; }
-        
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseNpgsql(_databaseOptions.ConnectionString(), b => b.MigrationsAssembly("Web"));
+            optionsBuilder.UseNpgsql(_databaseOptions.ConnectionString(),
+                    b => b.MigrationsAssembly("DatabaseMigration"))
+                .UseSnakeCaseNamingConvention();
+        }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.HasDefaultSchema("blogging");
         }
     }
 }
