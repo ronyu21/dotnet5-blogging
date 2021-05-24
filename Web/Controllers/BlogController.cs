@@ -11,10 +11,10 @@ namespace Web.Controllers
 {
     public class BlogController : BaseApiController
     {
-        private readonly IRepository<Blog> _blogRepository;
+        private readonly IBlogRepository _blogRepository;
         private readonly ILogger<BlogController> _logger;
 
-        public BlogController(IRepository<Blog> blogRepository, ILogger<BlogController> logger)
+        public BlogController(IBlogRepository blogRepository, ILogger<BlogController> logger)
         {
             _blogRepository = blogRepository;
             _logger = logger;
@@ -30,7 +30,7 @@ namespace Web.Controllers
         public async Task<Blog> GetById(long id)
         {
             _logger.LogInformation("Received param {Id}", id);
-            return await _blogRepository.GetAsync(id);
+            return await _blogRepository.GetAsyncWithPosts(id);
         }
 
         [HttpPost]

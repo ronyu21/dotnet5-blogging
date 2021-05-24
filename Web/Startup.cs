@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using Infrastructure.Configurations;
 using Infrastructure.Repository;
 using Microsoft.AspNetCore.Builder;
@@ -26,7 +27,7 @@ namespace Web
             // setup configuration options
             services.AddOptions<DatabaseOptions>().BindConfiguration(DatabaseOptions.Key);
 
-            services.AddControllers();
+            services.AddControllers().AddJsonOptions(options => options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve);
 
             var databaseOptions = new DatabaseOptions();
             Configuration.GetSection(DatabaseOptions.Key).Bind(databaseOptions);
@@ -36,6 +37,7 @@ namespace Web
             services.AddSpaStaticFiles(options => options.RootPath = "client-app/dist");
 
             services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+            services.AddScoped<IBlogRepository, BlogRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
