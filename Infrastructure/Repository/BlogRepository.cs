@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Infrastructure.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -20,45 +21,49 @@ namespace Infrastructure.Repository
 
     public class BlogRepository : IBlogRepository
     {
-        private readonly BloggingContext context;
+        private readonly BloggingContext _context;
 
         public BlogRepository(BloggingContext context)
         {
-            this.context = context;
+            _context = context;
         }
 
         public async Task<IEnumerable<Blog>> GetAllAsync()
         {
-            return await context.Blogs.ToListAsync();
+            return await _context.Blogs
+                .Include(blog => blog.Posts)
+                .ToListAsync();
         }
 
         public async Task<Blog> GetAsync(int blogId)
         {
-            return await context.Blogs.FindAsync(blogId);
+            return await _context.Blogs
+                .Include(blog => blog.Posts)
+                .FirstOrDefaultAsync(b => b.BlogId == blogId);
         }
 
         public async Task<Blog> CreateAsync(Blog blog)
         {
-            var created = context.Blogs.Add(blog);
-            await context.SaveChangesAsync();
+            var created = _context.Blogs.Add(blog);
+            await _context.SaveChangesAsync();
             return created.Entity;
         }
 
         public async Task<Blog> UpdateAsync(Blog blog)
         {
-            var updated = context.Blogs.Update(blog);
-            await context.SaveChangesAsync();
+            var updated = _context.Blogs.Update(blog);
+            await _context.SaveChangesAsync();
             return updated.Entity;
         }
 
         public async Task DeleteAsync(int blogId)
         {
-            context.Blogs.Remove(new Blog
+            _context.Blogs.Remove(new Blog
             {
                 BlogId = blogId
             });
 
-            await context.SaveChangesAsync();
+            await _context.SaveChangesAsync();
         }
     }
 }

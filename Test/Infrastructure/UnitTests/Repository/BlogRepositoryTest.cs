@@ -68,7 +68,15 @@ namespace Test.Infrastructure.UnitTests.Repository
             for (var i = 0; i < 2; i++)
                 expected.Add(await _blogRepository.CreateAsync(new Blog
                 {
-                    Url = $"http://localhost/blog{i + 1}"
+                    Url = $"http://localhost/blog{i + 1}",
+                    Posts = new List<Post>()
+                    {
+                        new Post()
+                        {
+                            Content = Faker.Lorem.Paragraph(),
+                            Title = Faker.Lorem.Sentence()
+                        }
+                    }
                 }));
 
             foreach (var blog in expected)
@@ -76,6 +84,7 @@ namespace Test.Infrastructure.UnitTests.Repository
                 var actual = await _blogRepository.GetAsync(blog.BlogId);
                 Assert.AreEqual(actual.BlogId, blog.BlogId);
                 Assert.AreEqual(actual.Url, blog.Url);
+                Assert.AreEqual(actual.Posts.Count, blog.Posts.Count);
             }
         }
 
