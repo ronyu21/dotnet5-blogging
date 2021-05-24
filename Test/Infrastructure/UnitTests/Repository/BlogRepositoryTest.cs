@@ -47,15 +47,13 @@ namespace Test.Infrastructure.UnitTests.Repository
         [Test]
         public async Task ShouldAbleToGetAllBlogs()
         {
-            List<Blog> expected = new List<Blog>();
+            var expected = new List<Blog>();
 
-            for (int i = 0; i < 3; i++)
-            {
+            for (var i = 0; i < 3; i++)
                 expected.Add(await _blogRepository.CreateAsync(new Blog
                 {
                     Url = $"http://localhost/blog{i + 1}"
                 }));
-            }
 
             var actual = await _blogRepository.GetAllAsync();
 
@@ -65,15 +63,13 @@ namespace Test.Infrastructure.UnitTests.Repository
         [Test]
         public async Task ShouldAbleToGetBlogById()
         {
-            List<Blog> expected = new List<Blog>();
+            var expected = new List<Blog>();
 
-            for (int i = 0; i < 2; i++)
-            {
+            for (var i = 0; i < 2; i++)
                 expected.Add(await _blogRepository.CreateAsync(new Blog
                 {
                     Url = $"http://localhost/blog{i + 1}"
                 }));
-            }
 
             foreach (var blog in expected)
             {
@@ -86,15 +82,13 @@ namespace Test.Infrastructure.UnitTests.Repository
         [Test]
         public async Task ShouldAbleToUpdateBlog()
         {
-            List<Blog> blogs = new List<Blog>();
+            var blogs = new List<Blog>();
 
-            for (int i = 0; i < 2; i++)
-            {
+            for (var i = 0; i < 2; i++)
                 blogs.Add(await _blogRepository.CreateAsync(new Blog
                 {
                     Url = $"http://localhost/blog{i + 1}"
                 }));
-            }
 
             var expected = blogs.Last();
             expected.Url = "changed";
@@ -114,15 +108,13 @@ namespace Test.Infrastructure.UnitTests.Repository
         [Test]
         public async Task ShouldAbleToDeleteBlog()
         {
-            List<Blog> blogs = new List<Blog>();
+            var blogs = new List<Blog>();
 
-            for (int i = 0; i < 2; i++)
-            {
+            for (var i = 0; i < 2; i++)
                 blogs.Add(new Blog
                 {
                     Url = $"http://localhost/blog{i + 1}"
                 });
-            }
 
             _context.Blogs.AddRange(blogs);
             await _context.SaveChangesAsync();

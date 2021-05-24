@@ -1,4 +1,3 @@
-using System;
 using Infrastructure.Configurations;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;

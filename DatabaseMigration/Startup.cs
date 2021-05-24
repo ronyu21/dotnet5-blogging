@@ -27,16 +27,14 @@ namespace DatabaseMigration
 
             var databaseOptions = new DatabaseOptions();
             Configuration.GetSection(DatabaseOptions.Key).Bind(databaseOptions);
-            services.AddDbContext<BloggingContext>(options => options.UseNpgsql(databaseOptions.ConnectionString()).UseSnakeCaseNamingConvention());
+            services.AddDbContext<BloggingContext>(options =>
+                options.UseNpgsql(databaseOptions.ConnectionString()).UseSnakeCaseNamingConvention());
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
+            if (env.IsDevelopment()) app.UseDeveloperExceptionPage();
 
             app.UseRouting();
 

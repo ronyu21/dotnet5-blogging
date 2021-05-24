@@ -16,7 +16,7 @@ namespace Web.Helpers
     {
         // default port number of 'npm run dev'
         private static int Port { get; } = 3000;
-        private static Uri DevelopmentServerEndpoint { get; } = new Uri($"http://localhost:{Port}");
+        private static Uri DevelopmentServerEndpoint { get; } = new($"http://localhost:{Port}");
 
         private static TimeSpan Timeout { get; } = TimeSpan.FromSeconds(30);
 
@@ -30,10 +30,7 @@ namespace Web.Helpers
                 var loggerFactory = spa.ApplicationBuilder.ApplicationServices.GetService<ILoggerFactory>();
                 var logger = loggerFactory.CreateLogger("Nuxt");
                 // if 'npm dev' command was executed yourself, then just return the endpoint.
-                if (IsRunning())
-                {
-                    return DevelopmentServerEndpoint;
-                }
+                if (IsRunning()) return DevelopmentServerEndpoint;
 
                 // launch Nuxt development server
                 var isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
@@ -45,7 +42,7 @@ namespace Web.Helpers
                     RedirectStandardError = true,
                     RedirectStandardInput = true,
                     RedirectStandardOutput = true,
-                    UseShellExecute = false,
+                    UseShellExecute = false
                 };
                 var process = Process.Start(processInfo);
                 var tcs = new TaskCompletionSource<int>();
@@ -57,10 +54,7 @@ namespace Web.Helpers
                         while ((line = process.StandardOutput.ReadLine()) != null)
                         {
                             logger.LogInformation(line);
-                            if (!tcs.Task.IsCompleted && line.Contains(DoneMessage))
-                            {
-                                tcs.SetResult(1);
-                            }
+                            if (!tcs.Task.IsCompleted && line.Contains(DoneMessage)) tcs.SetResult(1);
                         }
                     }
                     catch (EndOfStreamException ex)
@@ -74,10 +68,7 @@ namespace Web.Helpers
                     try
                     {
                         string line;
-                        while ((line = process.StandardError.ReadLine()) != null)
-                        {
-                            logger.LogError(line);
-                        }
+                        while ((line = process.StandardError.ReadLine()) != null) logger.LogError(line);
                     }
                     catch (EndOfStreamException ex)
                     {
@@ -87,18 +78,18 @@ namespace Web.Helpers
                 });
 
                 var timeout = Task.Delay(Timeout);
-                if (await Task.WhenAny(timeout, tcs.Task) == timeout)
-                {
-                    throw new TimeoutException();
-                }
+                if (await Task.WhenAny(timeout, tcs.Task) == timeout) throw new TimeoutException();
 
                 return DevelopmentServerEndpoint;
             });
         }
 
-        private static bool IsRunning() => IPGlobalProperties.GetIPGlobalProperties()
-            .GetActiveTcpListeners()
-            .Select(x => x.Port)
-            .Contains(Port);
+        private static bool IsRunning()
+        {
+            return IPGlobalProperties.GetIPGlobalProperties()
+                .GetActiveTcpListeners()
+                .Select(x => x.Port)
+                .Contains(Port);
+        }
     }
 }
