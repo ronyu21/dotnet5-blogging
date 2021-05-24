@@ -30,11 +30,12 @@ namespace Web
 
             var databaseOptions = new DatabaseOptions();
             Configuration.GetSection(DatabaseOptions.Key).Bind(databaseOptions);
-            services.AddDbContext<BloggingContext>(options => options.UseNpgsql(databaseOptions.ConnectionString(),
-                b => b.MigrationsAssembly("Infrastructure")).UseSnakeCaseNamingConvention());
+            services.AddDbContext<BloggingContext>(options => options.UseNpgsql(databaseOptions.ConnectionString()));
 
             services.AddSwaggerGen(c => { c.SwaggerDoc("v1", new OpenApiInfo {Title = "Web", Version = "v1"}); });
             services.AddSpaStaticFiles(options => options.RootPath = "client-app/dist");
+
+            services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

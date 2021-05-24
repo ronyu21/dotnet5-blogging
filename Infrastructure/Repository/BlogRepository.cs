@@ -39,7 +39,7 @@ namespace Infrastructure.Repository
         {
             return await _context.Blogs
                 .Include(blog => blog.Posts)
-                .FirstOrDefaultAsync(b => b.BlogId == blogId);
+                .FirstOrDefaultAsync(b => b.Id == blogId);
         }
 
         public async Task<Blog> CreateAsync(Blog blog)
@@ -60,7 +60,7 @@ namespace Infrastructure.Repository
         {
             _context.Blogs.Remove(new Blog
             {
-                BlogId = blogId
+                Id = blogId
             });
 
             await _context.SaveChangesAsync();

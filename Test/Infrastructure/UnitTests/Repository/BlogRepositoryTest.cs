@@ -10,13 +10,13 @@ namespace Test.Infrastructure.UnitTests.Repository
 {
     public class BlogRepositoryTest : TestBase
     {
-        private IBlogRepository _blogRepository;
+        private IRepository<Blog> _blogRepository;
         private BloggingContext _context;
 
         [SetUp]
         public void Setup()
         {
-            _blogRepository = new BlogRepository(new BloggingContext(databaseOptions));
+            _blogRepository = new Repository<Blog>(new BloggingContext(databaseOptions));
 
             _context = new BloggingContext(databaseOptions);
 
@@ -33,7 +33,7 @@ namespace Test.Infrastructure.UnitTests.Repository
         [Test]
         public async Task ShouldAbleToCreateBlogRecord()
         {
-            var expected = await _blogRepository.CreateAsync(new Blog
+            var expected = await _blogRepository.InsertAsync(new Blog
             {
                 Url = "http://localhost/blog1"
             });
@@ -50,14 +50,16 @@ namespace Test.Infrastructure.UnitTests.Repository
             var expected = new List<Blog>();
 
             for (var i = 0; i < 3; i++)
-                expected.Add(await _blogRepository.CreateAsync(new Blog
+                expected.Add(await _blogRepository.InsertAsync(new Blog
                 {
                     Url = $"http://localhost/blog{i + 1}"
                 }));
 
-            var actual = await _blogRepository.GetAllAsync();
-
-            actual.ToList().ForEach(blog => Assert.Contains(blog, expected));
+            var actual = _blogRepository.GetAllAsync();
+            await foreach (var blog in actual)
+            {
+                Assert.That(expected, Contains.Item(blog));
+            }
         }
 
         [Test]
@@ -66,7 +68,7 @@ namespace Test.Infrastructure.UnitTests.Repository
             var expected = new List<Blog>();
 
             for (var i = 0; i < 2; i++)
-                expected.Add(await _blogRepository.CreateAsync(new Blog
+                expected.Add(await _blogRepository.InsertAsync(new Blog
                 {
                     Url = $"http://localhost/blog{i + 1}",
                     Posts = new List<Post>()
@@ -81,8 +83,8 @@ namespace Test.Infrastructure.UnitTests.Repository
 
             foreach (var blog in expected)
             {
-                var actual = await _blogRepository.GetAsync(blog.BlogId);
-                Assert.AreEqual(actual.BlogId, blog.BlogId);
+                var actual = await _blogRepository.GetAsync(blog.Id);
+                Assert.AreEqual(actual.Id, blog.Id);
                 Assert.AreEqual(actual.Url, blog.Url);
                 Assert.AreEqual(actual.Posts.Count, blog.Posts.Count);
             }
@@ -94,7 +96,7 @@ namespace Test.Infrastructure.UnitTests.Repository
             var blogs = new List<Blog>();
 
             for (var i = 0; i < 2; i++)
-                blogs.Add(await _blogRepository.CreateAsync(new Blog
+                blogs.Add(await _blogRepository.InsertAsync(new Blog
                 {
                     Url = $"http://localhost/blog{i + 1}"
                 }));
@@ -103,14 +105,14 @@ namespace Test.Infrastructure.UnitTests.Repository
             expected.Url = "changed";
 
             var actual = await _blogRepository.UpdateAsync(expected);
-            Assert.AreEqual(expected.BlogId, actual.BlogId);
+            Assert.AreEqual(expected.Id, actual.Id);
             Assert.AreEqual(expected.Url, actual.Url);
 
             actual = _context.Blogs.FromSqlInterpolated(
-                $"SELECT * FROM blogging.blogs WHERE blog_id = {expected.BlogId}").FirstOrDefault();
+                $"SELECT * FROM blogging.blogs WHERE id = {expected.Id}").FirstOrDefault();
 
             Assert.NotNull(actual);
-            Assert.AreEqual(expected.BlogId, actual.BlogId);
+            Assert.AreEqual(expected.Id, actual.Id);
             Assert.AreEqual(expected.Url, actual.Url);
         }
 
@@ -132,14 +134,14 @@ namespace Test.Infrastructure.UnitTests.Repository
 
             Assert.AreEqual(2, blogs.Count);
 
-            await _blogRepository.DeleteAsync(blogs.First().BlogId);
+            await _blogRepository.DeleteAsync(blogs.First());
 
             Assert.AreEqual(1, _context.Blogs.Count());
 
             blogs.RemoveAt(0);
             var expected = blogs.First();
             var actual = _context.Blogs.FromSqlRaw("select * from blogging.blogs").ToList().First();
-            Assert.AreEqual(expected.BlogId, actual.BlogId);
+            Assert.AreEqual(expected.Id, actual.Id);
             Assert.AreEqual(expected.Url, actual.Url);
         }
     }

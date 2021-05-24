@@ -1,9 +1,7 @@
 namespace Infrastructure.Entities
 {
-    public class Post
+    public class Post : BaseEntity
     {
-        public int PostId { get; set; }
-
         public string Title { get; set; }
 
         public string Content { get; set; }
