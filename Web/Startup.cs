@@ -19,7 +19,7 @@ namespace Web
             Configuration = configuration;
         }
 
-        public IConfiguration Configuration { get; }
+        private IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
@@ -27,7 +27,8 @@ namespace Web
             // setup configuration options
             services.AddOptions<DatabaseOptions>().BindConfiguration(DatabaseOptions.Key);
 
-            services.AddControllers().AddJsonOptions(options => options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve);
+            services.AddControllers().AddJsonOptions(options =>
+                options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve);
 
             var databaseOptions = new DatabaseOptions();
             Configuration.GetSection(DatabaseOptions.Key).Bind(databaseOptions);

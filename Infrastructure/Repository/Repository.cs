@@ -19,59 +19,59 @@ namespace Infrastructure.Repository
     {
         private readonly BloggingContext _context;
 
-        private DbSet<T> entities;
+        private readonly DbSet<T> _entities;
 
         public Repository(BloggingContext context)
         {
             _context = context;
 
-            entities = context.Set<T>();
+            _entities = context.Set<T>();
         }
 
-        public IAsyncEnumerable<T> GetAllAsync()
+        public virtual IAsyncEnumerable<T> GetAllAsync()
         {
-            return entities.AsAsyncEnumerable();
+            return _entities.AsAsyncEnumerable();
         }
 
-        public async Task<T> GetAsync(long id)
+        public virtual async Task<T> GetAsync(long id)
         {
-            return await entities.SingleOrDefaultAsync(entity => entity.Id == id);
+            return await _entities.SingleOrDefaultAsync(entity => entity.Id == id);
         }
 
-        public async Task<T> InsertAsync(T entity)
+        public virtual async Task<T> InsertAsync(T entity)
         {
             if (entity == null)
             {
                 throw new ArgumentNullException(nameof(entity));
             }
 
-            var created = entities.Add(entity);
+            var created = _entities.Add(entity);
             await _context.SaveChangesAsync();
 
             return created.Entity;
         }
 
-        public async Task<T> UpdateAsync(T entity)
+        public virtual async Task<T> UpdateAsync(T entity)
         {
             if (entity == null)
             {
                 throw new ArgumentNullException(nameof(entity));
             }
 
-            var updated = entities.Update(entity);
+            var updated = _entities.Update(entity);
             await _context.SaveChangesAsync();
 
             return updated.Entity;
         }
 
-        public async Task DeleteAsync(T entity)
+        public virtual async Task DeleteAsync(T entity)
         {
             if (entity == null)
             {
                 throw new ArgumentNullException(nameof(entity));
             }
 
-            entities.Remove(entity);
+            _entities.Remove(entity);
             await _context.SaveChangesAsync();
         }
     }

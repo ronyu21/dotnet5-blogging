@@ -8,15 +8,7 @@ namespace Infrastructure.Repository
 {
     public interface IBlogRepository : IRepository<Blog>
     {
-        // Task<IEnumerable<Blog>> GetAllAsync();
-
         Task<Blog> GetAsyncWithPosts(long blogId);
-
-        // Task<Blog> CreateAsync(Blog blog);
-        //
-        // Task<Blog> UpdateAsync(Blog blog);
-        //
-        // Task DeleteAsync(int blogId);
     }
 
     public class BlogRepository : Repository<Blog>, IBlogRepository
@@ -28,12 +20,12 @@ namespace Infrastructure.Repository
             _context = context;
         }
 
-        // public async Task<IEnumerable<Blog>> GetAllAsync()
-        // {
-        //     return await _context.Blogs
-        //         .Include(blog => blog.Posts)
-        //         .ToListAsync();
-        // }
+        public override IAsyncEnumerable<Blog> GetAllAsync()
+        {
+            return _context.Blogs
+                .Include(blog => blog.Posts)
+                .ToAsyncEnumerable();
+        }
 
         public async Task<Blog> GetAsyncWithPosts(long blogId)
         {
@@ -41,29 +33,5 @@ namespace Infrastructure.Repository
                 .Include(blog => blog.Posts)
                 .FirstOrDefaultAsync(b => b.Id == blogId);
         }
-
-        // public async Task<Blog> CreateAsync(Blog blog)
-        // {
-        // var created = _context.Blogs.Add(blog);
-        // await _context.SaveChangesAsync();
-        // return created.Entity;
-        // }
-
-        // public async Task<Blog> UpdateAsync(Blog blog)
-        // {
-        //     var updated = _context.Blogs.Update(blog);
-        //     await _context.SaveChangesAsync();
-        //     return updated.Entity;
-        // }
-        //
-        // public async Task DeleteAsync(int blogId)
-        // {
-        //     _context.Blogs.Remove(new Blog
-        //     {
-        //         Id = blogId
-        //     });
-        //
-        //     await _context.SaveChangesAsync();
-        // }
     }
 }
