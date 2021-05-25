@@ -1,4 +1,4 @@
-# Blog Solution
+# Experiment .Net 5 Solution
 This is a experiment solution created in .Net 5 framework. 
 The purpose of the solution is to setup a solution from scratch using .Net 5 framework, EntityFrameworkCore 5 for backend and NuxtJS for the frontend.
 
